@@ -15,7 +15,7 @@ circle(screen, (200, 0, 0), (260, 150), 30)
 
 pygame.display.update()
 clock = pygame.time.Clock()
-finished = False
+finished = False 
 
 while not finished:
     clock.tick(FPS)
