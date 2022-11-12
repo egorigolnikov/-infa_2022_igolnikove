@@ -1,7 +1,7 @@
 import math
-from random import choice
-
+import random as rnd
 import pygame
+import choice
 
 
 FPS = 30
@@ -66,10 +66,10 @@ class Ball:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
         # FIXME
-            return False
+        return False
 
 
-class Gun:
+class Gun():
     def __init__(self, screen):
         self.screen = screen
         self.f2_power = 10
