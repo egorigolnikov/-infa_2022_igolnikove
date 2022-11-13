@@ -1,7 +1,7 @@
 import math
 import random as rnd
 import pygame
-import choice
+from random import choice
 
 
 FPS = 30
@@ -19,6 +19,8 @@ GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
 WIDTH = 800
 HEIGHT = 600
+
+global x, y
 
 
 class Ball:
@@ -76,6 +78,7 @@ class Gun():
         self.f2_on = 0
         self.an = 1
         self.color = GREY
+     
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -107,7 +110,13 @@ class Gun():
             self.color = GREY
 
     def draw(self):
-        # FIXIT don't know how to do it
+        # FIXIT don't know how to do 
+        dx = self.tx - self.x
+        dy = self.ty - self.y
+        r = (dx*dx+dy*dy)**0.5
+        dx *= self.f2_power*4/r
+        dy *= self.f2_power*4/r
+        pygame.draw.line(self.screen, self.color, (self.x, self.y),(self.x + dx, self.y + dy), 7)
 
     def power_up(self):
         if self.f2_on:
@@ -119,10 +128,11 @@ class Gun():
 
 
 class Target:
-    # self.points = 0
-    # self.live = 1
-    # FIXME: don't work!!! How to call this functions when object is created?
-    # self.new_target()
+    def __init__(self, screen):
+        self.screen = screen
+        self.points = 0
+        self.live = 1
+        self.new_target()
 
     def new_target(self):
         """ Инициализация новой цели. """
@@ -136,7 +146,7 @@ class Target:
         self.points += points
 
     def draw(self):
-        ...
+        pygame.draw.circle(self.screen, self.color, (self.x, self.y,), self.r)
 
 
 pygame.init()
@@ -146,7 +156,7 @@ balls = []
 
 clock = pygame.time.Clock()
 gun = Gun(screen)
-target = Target()
+target = Target(screen)
 finished = False
 
 while not finished:
