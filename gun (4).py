@@ -1,4 +1,5 @@
 import math
+import random as rnd
 from random import choice
 
 import pygame
@@ -45,9 +46,8 @@ class Ball:
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
-        # FIXME
-        self.x += self.vx
-        self.y -= self.vy
+        self.x += self.vx * dt/30
+        self.y -= self.vy * dt/30
 
     def draw(self):
         pygame.draw.circle(
@@ -57,7 +57,7 @@ class Ball:
             self.r
         )
 
-    def hittest(self, obj):
+    def hittest(self, new_target):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
 
         Args:
@@ -66,7 +66,8 @@ class Ball:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
         # FIXME
-            return False
+        return False
+        
 
 
 class Gun:
@@ -108,7 +109,7 @@ class Gun:
 
     def draw(self):
         # FIXIT don't know how to do it
-
+        pass
     def power_up(self):
         if self.f2_on:
             if self.f2_power < 100:
@@ -119,10 +120,12 @@ class Gun:
 
 
 class Target:
-    # self.points = 0
-    # self.live = 1
-    # FIXME: don't work!!! How to call this functions when object is created?
-    # self.new_target()
+    def __init__(self, screen: pygame.Surface):
+        self.screen = screen
+        self.points = 0
+        self.live = 1
+        self.new_target()
+
 
     def new_target(self):
         """ Инициализация новой цели. """
@@ -157,7 +160,7 @@ while not finished:
         b.draw()
     pygame.display.update()
 
-    clock.tick(FPS)
+    dt = clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
