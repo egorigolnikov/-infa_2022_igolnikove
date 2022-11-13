@@ -1,10 +1,7 @@
 import math
 from random import choice
 from random import randint
-
-
 import pygame
-
 
 FPS = 30
 
@@ -21,8 +18,6 @@ GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
 WIDTH = 800
 HEIGHT = 600
-
-
 
 class Ball:
     def __init__(self, screen: pygame.Surface, x=40, y=450):
@@ -48,18 +43,16 @@ class Ball:
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
+        self.vy -= 0.01 * dt
         self.x += self.vx * dt/30
         self.y -= self.vy * dt/30
+        if (self.y + self.r) >= HEIGHT and self.vy > 0:
+            self.vy = - self.vy
 
     def draw(self):
-        pygame.draw.circle(
-            self.screen,
-            self.color,
-            (self.x, self.y),
-            self.r
-        )
+        pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.r)
 
-    def hittest(self, new_target):
+    def hittest(self, obj):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
 
         Args:
@@ -67,8 +60,13 @@ class Ball:
         Returns:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
-        # FIXME
-        return False
+        dx =  self.x
+        dy =  self.y
+        dr = self.r
+        x1 = obj.x
+        x2 = obj.y
+        x3 = obj.r
+        return(((dx-x1)**2 + (dy-x2)**2)**0.5 < (dr + x3))
         
 
 
@@ -81,8 +79,8 @@ class Gun:
         self.color = GREY
         self.x = 40
         self.y = 450
-        self.tx = 0
-        self.ty = 0
+
+
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -114,12 +112,9 @@ class Gun:
             self.color = GREY
 
     def draw(self):
-        dx = self.tx - self.x
-        dy = self.ty - self.y
-        r = (dx*dx + dy*dy)**0.5
-        dx *= self.f2_power * 4/r
-        dy *= self.f2_power * 4/r
-        pygame.draw.line(self.screen, self.color, (self.x, self.y), (self.x + dx, self.y + dy), 7)
+        dx = self.f2_power*5 * math.cos(self.an)
+        dy = self.f2_power*5 * math.sin(self.an)
+        pygame.draw.line(self.screen, self.color, (20, 450), (20 + dx, 450 + dy), 7)
         
         
     def power_up(self):
@@ -137,10 +132,11 @@ class Target:
         self.points = 0
         self.live = 1
         self.new_target()
-
+        self.color = choice(GAME_COLORS)
 
     def new_target(self):
         """ Инициализация новой цели. """
+        global x, y, r
         self.x = randint(600, 780)
         self.y = randint(300, 550)
         self.r = randint(2, 50)
@@ -151,13 +147,19 @@ class Target:
         self.points += points
 
     def draw(self):
-        ...
+        pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.r)
+    
+def score():
+    g = pygame.font.SysFont("comicsansms", 35)
+    value = g.render("Ваш счёт: " + str(target.points), True, GREEN)
+    screen.blit(value, [123, 110])
 
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 bullet = 0
 balls = []
+
 
 clock = pygame.time.Clock()
 gun = Gun(screen)
@@ -170,6 +172,7 @@ while not finished:
     target.draw()
     for b in balls:
         b.draw()
+    score()
     pygame.display.update()
 
     dt = clock.tick(FPS)
@@ -188,7 +191,10 @@ while not finished:
         if b.hittest(target) and target.live:
             target.live = 0
             target.hit()
+            print(target.points)
             target.new_target()
+            target.live = 1
+            target.color = choice(GAME_COLORS)
+        
     gun.power_up()
-
 pygame.quit()
