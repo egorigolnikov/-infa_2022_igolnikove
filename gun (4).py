@@ -1,3 +1,5 @@
+""" Program  """
+
 import math
 from random import choice
 from random import randint
@@ -20,7 +22,8 @@ WIDTH = 800
 HEIGHT = 600
 
 class Ball:
-    def __init__(self, screen: pygame.Surface, x=40, y=450):
+    """ Cоздаём шарики """
+    def __init__(self, screen, x=40, y=450):
         """ Конструктор класса ball
 
         Args:
@@ -50,6 +53,7 @@ class Ball:
             self.vy = - self.vy
 
     def draw(self):
+        """ Рисуем шарики  """
         pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.r)
 
     def hittest(self, obj):
@@ -67,10 +71,10 @@ class Ball:
         x2 = obj.y
         x3 = obj.r
         return(((dx-x1)**2 + (dy-x2)**2)**0.5 < (dr + x3))
-        
 
 
 class Gun:
+    """ Класс пушка    """
     def __init__(self, screen):
         self.screen = screen
         self.f2_power = 10
@@ -83,6 +87,7 @@ class Gun:
 
 
     def fire2_start(self, event):
+        """" Начальный параметр  """
         self.f2_on = 1
 
     def fire2_end(self, event):
@@ -91,8 +96,7 @@ class Gun:
         Происходит при отпускании кнопки мыши.
         Начальные значения компонент скорости мяча vx и vy зависят от положения мыши.
         """
-        global balls, bullet
-        bullet += 1
+
         new_ball = Ball(self.screen)
         new_ball.r += 5
         self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
@@ -112,12 +116,14 @@ class Gun:
             self.color = GREY
 
     def draw(self):
+        """" рисуем пушку """
         dx = self.f2_power*5 * math.cos(self.an)
         dy = self.f2_power*5 * math.sin(self.an)
         pygame.draw.line(self.screen, self.color, (20, 450), (20 + dx, 450 + dy), 7)
-        
-        
+
+
     def power_up(self):
+        """" длина пушки """
         if self.f2_on:
             if self.f2_power < 100:
                 self.f2_power += 1
@@ -127,6 +133,7 @@ class Gun:
 
 
 class Target:
+    """ класс цель """
     def __init__(self, screen: pygame.Surface):
         self.screen = screen
         self.points = 0
@@ -136,7 +143,6 @@ class Target:
 
     def new_target(self):
         """ Инициализация новой цели. """
-        global x, y, r
         self.x = randint(600, 780)
         self.y = randint(300, 550)
         self.r = randint(2, 50)
@@ -147,9 +153,12 @@ class Target:
         self.points += points
 
     def draw(self):
+        """" Рисуем цель"""
         pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.r)
-    
+
+
 def score():
+    """ подсчёт очков """
     g = pygame.font.SysFont("comicsansms", 35)
     value = g.render("Ваш счёт: " + str(target.points), True, GREEN)
     screen.blit(value, [123, 110])
@@ -157,7 +166,6 @@ def score():
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-bullet = 0
 balls = []
 
 
@@ -195,6 +203,6 @@ while not finished:
             target.new_target()
             target.live = 1
             target.color = choice(GAME_COLORS)
-        
+    
     gun.power_up()
 pygame.quit()
