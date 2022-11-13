@@ -23,6 +23,7 @@ WIDTH = 800
 HEIGHT = 600
 
 
+
 class Ball:
     def __init__(self, screen: pygame.Surface, x=40, y=450):
         """ Конструктор класса ball
@@ -78,6 +79,10 @@ class Gun:
         self.f2_on = 0
         self.an = 1
         self.color = GREY
+        self.x = 40
+        self.y = 450
+        self.tx = 0
+        self.ty = 0
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -109,8 +114,14 @@ class Gun:
             self.color = GREY
 
     def draw(self):
-        # FIXIT don't know how to do it
-        pass
+        dx = self.tx - self.x
+        dy = self.ty - self.y
+        r = (dx*dx + dy*dy)**0.5
+        dx *= self.f2_power * 4/r
+        dy *= self.f2_power * 4/r
+        pygame.draw.line(self.screen, self.color, (self.x, self.y), (self.x + dx, self.y + dy), 7)
+        
+        
     def power_up(self):
         if self.f2_on:
             if self.f2_power < 100:
