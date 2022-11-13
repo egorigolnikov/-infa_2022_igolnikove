@@ -1,6 +1,7 @@
 import math
-import random as rnd
 from random import choice
+from random import randint
+
 
 import pygame
 
@@ -129,10 +130,10 @@ class Target:
 
     def new_target(self):
         """ Инициализация новой цели. """
-        x = self.x = rnd(600, 780)
-        y = self.y = rnd(300, 550)
-        r = self.r = rnd(2, 50)
-        color = self.color = RED
+        self.x = randint(600, 780)
+        self.y = randint(300, 550)
+        self.r = randint(2, 50)
+        self.color = RED
 
     def hit(self, points=1):
         """Попадание шарика в цель."""
@@ -149,7 +150,7 @@ balls = []
 
 clock = pygame.time.Clock()
 gun = Gun(screen)
-target = Target()
+target = Target(screen)
 finished = False
 
 while not finished:
