@@ -1,9 +1,10 @@
+""" Catch the ball """
+from random import randint
 import pygame
 from pygame.draw import *
-from random import randint
 pygame.init()
 FPS = 0.5
-screen = pygame.display.set_mode((1200, 900)) 
+screen = pygame.display.set_mode((1200, 900))
 # создаём массив цветов
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -19,7 +20,7 @@ b, k, z = (0, 0, 0)
 
 
 def new_ball():
-    # рисуем круг
+    """рисуем круг"""
     global x, y, r
     x = randint(100,700)
     y = randint(100,500)
@@ -29,14 +30,14 @@ def new_ball():
 
 
 def tap():
-    # проверяем, попали ли в круг
+    """ проверяем, попали ли в круг"""
     global z
-    if((((x-x1)**2 + (y-y1)**2)**0.5) < r):
+    if (((x-x1)**2 + (y-y1)**2)**0.5) < r:
         z = 1
 
 
 def score():
-    # выводим счёт
+    """выводим счёт"""
     g = pygame.font.SysFont("comicsansms", 35)
     value = g.render("Ваш счёт: " + str(k), True, GREEN)
     screen.blit(value, [100, 110])
@@ -45,19 +46,20 @@ def score():
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
-        
+
+
 while not finished:
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            x1 = event.pos[0]  
+            x1 = event.pos[0]
             y1 = event.pos[1]
             tap()
 
     k = k + z
-    z = 0
+    Z = 0
     score()
     new_ball()
     pygame.display.update()
