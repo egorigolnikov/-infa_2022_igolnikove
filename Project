@@ -1,7 +1,6 @@
 from random import randint
 import pygame
 import numpy as np
-import math
 import matplotlib.pyplot as plt
 
 FPS = 30
@@ -13,7 +12,7 @@ HEIGHT = 600
 
 class Roc:
 
-    def __init__(self, screen, x=350, y=300, h = 100, w = 250, m = 30):
+    def __init__(self, screen, x=350, y=300, h = 250, w = 100):
         self.screen = screen
         self.x = x
         self.y = y
@@ -21,24 +20,25 @@ class Roc:
         self.w = w
         self.vx = 0
         self.vy = 0
-        self.color = GREY
-        self.m = m
-        self.ax = 0
-        self.ay = 0
-        self.g = 0.03
+        self.m = 30
+        self.mt = 0
+        self.g = 10
         self.N = 0
+        self.A = 0
+        self.L = 'OFF'
+        self.color = GREY
+
 
     def move(self):
-         self.vy -= - self.g * dt/30 - self.N/(1-self.N/50)*0.01
+         self.vy -= - self.g * dt/10000 - self.N/(1-self.N/50)*0.01 + self.A * (self.vy)
          self.y += self.vy * dt/30
 
     def imp(self):
         self.N = 0
         
-
     def draw(self):
-        pygame.draw.rect(self.screen, self.color, pygame.Rect(self.x, self.y, self.h, self.w))
-        pygame.draw.lines(self.screen, self.color, True, [[self.x, self.y], [self.x + self.h, self.y], [self.x + 0.5 * self.h, self.y - 30]], 30)
+        pygame.draw.rect(self.screen, self.color, pygame.Rect(self.x, self.y, self.w, self.h))
+        pygame.draw.lines(self.screen, self.color, True, [[self.x, self.y], [self.x + self.w, self.y], [self.x + 0.5 * self.w, self.y - 30]], 30)
 
 class Fu:
 
@@ -49,17 +49,20 @@ class Fu:
         self.r = 1
         self.vx = 0
         self.vy = 0
-        self.g = 0.03
+        self.g = 10
+        self.count = 1089
         self.color = RED
      
     def move(self):
-        self.vy =  roc.vy + self.g * dt/30 * (1 + (self.y - roc.y - 450)/(roc.w -450)*10)
+        self.vy =  roc.vy + self.g * dt/10000 * (1 + (self.y - roc.y - 450)/(roc.h -450)*(self.count)/108.9)
         self.y += self.vy * dt/30
-        if (self.y-self.r)> (roc.y + roc.w):
-            self.vy = 1
-            self.y += self.vy * dt + self.g*dt*dt/2
+        self.x += self.vx * dt
 
-     
+        if (self.y-self.r)> (roc.y + roc.h):
+            self.vy = 1
+            self.y += self.vy * dt + self.g*dt*dt/666.7
+            self.vx =  randint(-1,1)
+ 
     def draw(self):
         pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.r)
 
@@ -70,35 +73,113 @@ class Fu:
         dy = self.y
         dr = self.r
         x1 = obj.y
-        x2 = obj.w 
+        x2 = obj.h 
         return((dy+dr)<(x1+x2) and (dy+3*dr)>(x1+x2))
+
+def start():
+    u = pygame.font.SysFont("comicsansms", 20)
+    value = u.render("Start: off" , True, RED)
+    screen.blit(value, [260, 10])
+
+def Air_force():
+    roc.A = 0.01
+    roc.L = 'ON'
+
+def no_Air_force():
+    roc.A = 0
+    roc.L = 'OFF'
+
+def parametres():
+    m = pygame.font.SysFont("comicsansms", 18)
+    value = m.render("Скорость ракеты: " + str(round(roc.vy)), True, RED)
+    screen.blit(value, [10, 10])
+    r = pygame.font.SysFont("comicsansms", 18)
+    value = r.render("Координата ракеты: " + str(round(roc.y)), True, RED)
+    screen.blit(value, [10, 30])
+    p = pygame.font.SysFont("comicsansms", 18)
+    value = p.render("Масса корпуса ракеты: " + str(round(roc.m)), True, RED)
+    screen.blit(value, [10, 50])
+    x = pygame.font.SysFont("comicsansms", 18)
+    value = x.render("Масса топлива ракеты: " + str(round(roc.mt)), True, RED)
+    screen.blit(value, [10, 70])
+    o = pygame.font.SysFont("comicsansms", 18)
+    value = o.render("Сила сопротивления: " + str(roc.L), True, RED)
+    screen.blit(value, [10, 90])
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+D = []
 B = []
 A = []
-for j in range(1,100,3):
-    for i in range(1,100,3):
+for j in range(2,100,3):
+    for i in range(2,100,3):
         fu = Fu(screen, x = 350 +  i, y = 450 + j)
         A.append(fu)
-
-clock = pygame.time.Clock()
 roc = Roc(screen)
-finished = False
-
+d = False
+while not d:
+    screen.fill(WHITE)
+    roc.draw()
+    start()
+    parametres()
+    for fu in A:
+        fu.draw()
+    pygame.display.update()
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_1:
+                finished = False
+                d = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_2:
+                    roc.m += 1
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_3:
+                    roc.m -= 1
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_4:
+                    Air_force()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_5:
+                    no_Air_force()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_6:
+                    roc.mt += 1
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_7:
+                    roc.mt -= 1
+            
+clock = pygame.time.Clock()
 while not finished:
     screen.fill(WHITE)
     roc.draw()
+    parametres()
     for fu in A:
         fu.draw()
-
     pygame.display.update()
-
     dt = clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
-
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_2:
+                roc.m += 1
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_3:
+                roc.m -= 1
+        if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_4:
+                    Air_force()
+        if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_5:
+                    no_Air_force()
+        if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_6:
+                    roc.mt += 1
+        if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_7:
+                    roc.mt -= 1
+            
     for a in A:
         a.move()
         if a.hittest(roc):
@@ -108,14 +189,23 @@ while not finished:
             roc.imp()
     roc.move()
     pygame.display.update()
-    B.append(roc.vy)
+    B.append(-roc.vy)
+    D.append(-roc.y+294)
     C = []
     for i in range(len(B)):
         C.append(int(i))
-    print(roc.vy)
-    print(roc.N)
-pygame.quit()
-x = np.array(range(len(B)))
-y = np.vectorize(B)
+
+y = B
+x = np.vectorize(lambda i : int(i))(C)
 plt.plot(x, y)
+plt.title("Скорость ракеты")
+
+
 plt.show()
+
+t = np.vectorize(lambda i : int(i))(C)
+w = D
+plt.plot(t, w)
+plt.title("Координата ракеты")
+plt.show()
+pygame.quit()
