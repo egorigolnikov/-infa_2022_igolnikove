@@ -1,1 +1,1 @@
-# -infa_2022_igolnikove
+# -1_sem_Python_programming
